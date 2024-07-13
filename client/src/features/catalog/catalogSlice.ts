@@ -9,7 +9,7 @@ import { Product, ProductParams } from '../../app/models/product';
 import { MetaData } from '../../app/models/pagination';
 import { RootState } from '../../app/store/configureStore';
 
-interface CatalogState {
+export interface CatalogState {
   productsLoaded: boolean;
   filtersLoaded: boolean;
   status: string;

@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 import { router } from '../router/Routes';
 import { PaginatedResponse } from '../models/pagination';
+import { store } from '../store/configureStore';
 
 const sleep = () => new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -9,6 +10,12 @@ axios.defaults.baseURL = 'http://localhost:5000/api/';
 axios.defaults.withCredentials = true;
 
 const responseBody = (response: AxiosResponse) => response.data;
+
+axios.interceptors.request.use((config) => {
+  const token = store.getState().account.user?.token;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
 axios.interceptors.response.use(
   async (response) => {
@@ -19,7 +26,7 @@ axios.interceptors.response.use(
         response.data,
         JSON.parse(pagination)
       );
-      //console.log(response);
+      //console.log('response ' + response.data);
       return response;
     }
     return response;
@@ -40,6 +47,7 @@ axios.interceptors.response.use(
         toast.error(data.title);
         break;
       case 401:
+        //console.log(status + ' test unauthorized');
         toast.error(data.title);
         break;
       case 500:
@@ -82,10 +90,17 @@ const Basket = {
     requests.del(`basket?productId=${productId}&quantity=${quantity}`),
 };
 
+const Account = {
+  login: (values: any) => requests.post('account/login', values),
+  register: (values: any) => requests.post('account/register', values),
+  currentUser: () => requests.get('account/currentUser'),
+};
+
 const agent = {
   Catalog,
   TestErrors,
   Basket,
+  Account,
 };
 
 export default agent;
