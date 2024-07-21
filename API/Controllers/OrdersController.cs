@@ -70,7 +70,8 @@ public class OrdersController(StoreContext context) : BaseApiController
             BuyerId = basket.BuyerId,
             ShippingAddress = orderDto.ShippingAddress,
             Subtotal = subtotal,
-            DeliveryFee = deliveryFee
+            DeliveryFee = deliveryFee,
+            PaymentIntentId = basket.PaymentIntentId
         };
 
         context.Orders.Add(order);
