@@ -1,0 +1,12 @@
+services:
+  store-api:
+    image: wkumanuvong/store-api
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=host.docker.internal;Port=5432;Database=store;User Id=postgres;Password=admin24!!;Pooling=true
+    ports:
+      - "8080:8080"

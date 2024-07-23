@@ -65,14 +65,19 @@ export default function CheckoutPage() {
   }
 
   function onCardInputChange(event: any) {
-    setCardState({
-      ...cardState,
+    // Using functional updates to ensure latest state is used
+    setCardState((prevState) => ({
+      ...prevState,
       elementError: {
-        ...cardState.elementError,
+        ...prevState.elementError,
         [event.elementType]: event.error?.message,
       },
-    });
-    setCardComplete({ ...cardComplete, [event.elementType]: event.complete });
+    }));
+    // Using functional updates to ensure latest state is used
+    setCardComplete((prevState: any) => ({
+      ...prevState,
+      [event.elementType]: event.complete,
+    }));
   }
 
   const currentValidationSchema = validationSchema[activeStep];
@@ -120,14 +125,14 @@ export default function CheckoutPage() {
         setOrderNumber(orderNumber);
         setPaymentSucceeded(true);
         setPaymentMessage('Thank you - we have received your payment');
-        setActiveStep(activeStep + 1);
+        setActiveStep((activeStep) => activeStep + 1);
         dispatch(clearBasket());
         setLoading(false);
       } else {
         setPaymentMessage(paymentResult.error?.message || 'Payment failed');
         setPaymentSucceeded(false);
         setLoading(false);
-        setActiveStep(activeStep + 1);
+        setActiveStep((activeStep) => activeStep + 1);
       }
     } catch (error) {
       console.log(error);
@@ -139,12 +144,12 @@ export default function CheckoutPage() {
     if (activeStep === steps.length - 1) {
       await submitOrder(data);
     } else {
-      setActiveStep(activeStep + 1);
+      setActiveStep((activeStep) => activeStep + 1);
     }
   };
 
   const handleBack = () => {
-    setActiveStep(activeStep - 1);
+    setActiveStep((activeStep) => activeStep - 1);
   };
 
   function submitDisabled(): boolean {
