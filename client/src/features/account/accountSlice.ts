@@ -70,7 +70,7 @@ export const accountSlice = createSlice({
       router.navigate('/');
     },
     setUser: (state, action) => {
-      state.user = action.payload;
+      setUserAndRoles(action, state);
     },
   },
   extraReducers: (builder) => {
@@ -81,16 +81,26 @@ export const accountSlice = createSlice({
       toast.error('Session expired - please login again');
       router.navigate('/');
     });
-    builder.addCase(signInUser.rejected, (_state, action) => {
-      throw action.payload;
-    });
     builder.addMatcher(
       isAnyOf(signInUser.fulfilled, fetchCurrentUser.fulfilled),
       (state, action) => {
-        state.user = action.payload;
+        setUserAndRoles(action, state);
       }
     );
+    builder.addMatcher(isAnyOf(signInUser.rejected), (_state, action) => {
+      throw action.payload;
+    });
   },
 });
 
 export const { signOut, setUser } = accountSlice.actions;
+
+function setUserAndRoles(action: { payload: any; type: string }, state: any) {
+  const claims = JSON.parse(atob(action.payload.token.split('.')[1]));
+  const roles =
+    claims['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+  state.user = {
+    ...action.payload,
+    roles: typeof roles === 'string' ? [roles] : roles,
+  };
+}
